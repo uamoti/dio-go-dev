@@ -13,7 +13,9 @@ func main() {
 
     fmt.Println("Pin and Pan")
     for i := 1; i < 101; i++ {
-    	if i % 3 == 0 {
+    	if i % 3 == 0 && i % 5 == 0 {
+       	fmt.Println("PinPan")
+    	} else if i % 3 == 0 {
 	   fmt.Print("Pin ")
 	} else if i % 5 == 0 {
 	  fmt.Print("Pan ")
