@@ -16,6 +16,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 )
 
@@ -33,6 +34,12 @@ type Address struct {
 	Postcode string `json:"post"`
 }
 
+var customers []Customer
+
+func ListCustomers(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(customers)
+}
+
 func main() {
 	jsonFile, err := os.Open("customers.json")
 	if err != nil {
@@ -42,12 +49,14 @@ func main() {
 	defer jsonFile.Close()
 
 	jsonBites, _ := io.ReadAll(jsonFile)
-	var customers []Customer
 	json.Unmarshal(jsonBites, &customers)
 
-	for _, c := range customers {
-		fmt.Println(c.FirstName, c.LastName)
-		fmt.Println(c.Addr)
-		fmt.Println()
-	}
+	// for _, c := range customers {
+	// 	fmt.Println(c.FirstName, c.LastName)
+	// 	fmt.Println(c.Addr)
+	// 	fmt.Println()
+	// }
+	http.HandleFunc("/customers", ListCustomers)
+
+	http.ListenAndServe(":8000", nil)
 }
