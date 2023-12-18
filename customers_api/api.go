@@ -18,6 +18,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 type Customer struct {
@@ -40,6 +41,17 @@ func ListCustomers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(customers)
 }
 
+func GetCustomer(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Path
+	for _, c := range customers {
+		if cid := strconv.Itoa(c.Id); cid == id {
+			json.NewEncoder(w).Encode(c)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode("error: customer not found")
+}
+
 func main() {
 	jsonFile, err := os.Open("customers.json")
 	if err != nil {
@@ -56,7 +68,8 @@ func main() {
 	// 	fmt.Println(c.Addr)
 	// 	fmt.Println()
 	// }
+	customersPath := "/customers/"
 	http.HandleFunc("/customers", ListCustomers)
-
+	http.Handle(customersPath, http.StripPrefix(customersPath, http.HandlerFunc(GetCustomer)))
 	http.ListenAndServe(":8000", nil)
 }
