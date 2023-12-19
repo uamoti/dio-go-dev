@@ -37,8 +37,20 @@ type Address struct {
 
 var customers []Customer
 
-func ListCustomers(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(customers)
+func CustomersRootPath(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		json.NewEncoder(w).Encode(customers)
+	case "POST":
+		var newCustomer Customer
+		err := json.NewDecoder(r.Body).Decode(&newCustomer)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		customers = append(customers, newCustomer)
+		json.NewEncoder(w).Encode(newCustomer)
+	}
 }
 
 func GetCustomer(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +81,7 @@ func main() {
 	// 	fmt.Println()
 	// }
 	customersPath := "/customers/"
-	http.HandleFunc("/customers", ListCustomers)
+	http.HandleFunc("/customers", CustomersRootPath)
 	http.Handle(customersPath, http.StripPrefix(customersPath, http.HandlerFunc(GetCustomer)))
 	http.ListenAndServe(":8000", nil)
 }
