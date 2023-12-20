@@ -40,6 +40,7 @@ var customers []Customer
 func CustomersRootPath(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(customers)
 	case "POST":
 		var newCustomer Customer
@@ -49,6 +50,7 @@ func CustomersRootPath(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		customers = append(customers, newCustomer)
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(newCustomer)
 	}
 }
@@ -57,6 +59,7 @@ func GetCustomer(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Path
 	for _, c := range customers {
 		if cid := strconv.Itoa(c.Id); cid == id {
+			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(c)
 			return
 		}
