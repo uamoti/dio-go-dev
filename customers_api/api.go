@@ -75,6 +75,17 @@ func CustomerById(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		json.NewEncoder(w).Encode("error: customer not found")
+	case "DELETE":
+		id := r.URL.Path
+		for i, c := range customers {
+			if cid := strconv.Itoa(c.Id); cid == id {
+				w.Header().Set("Content-Type", "application/json")
+				customers = append(customers[:i], customers[i+1:]...)
+				json.NewEncoder(w).Encode(c)
+				return
+			}
+		}
+		json.NewEncoder(w).Encode("error: customer not found")
 	}
 }
 
